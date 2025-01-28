@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Annual Health Checkup Package",
+    "message": "Comprehensive health screening including blood work, vital signs, and consultation with specialists",
+    "price": "25% off"
+  },
+  {
+    "title": "Family Wellness Plan",
+    "message": "Complete family health coverage with unlimited consultations and preventive care for up to 4 members",
+    "price": "30% off"
+  },
+  {
+    "title": "Premium Mental Health Package",
+    "message": "Access to licensed therapists, stress management sessions, and wellness workshops for 6 months",
+    "price": "$199.99"
+  }
+]
