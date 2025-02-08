@@ -27,6 +27,7 @@ import {
   User,
   AddDoctor,
   AddPatient,
+  AddAdmin,
   Auth,
   Prescription,
   DoctorAppointment,
@@ -76,6 +77,7 @@ const index = () => {
   const [checkRegistration, setCheckRegistration] = useState();
   const [addDocotr, setAddDocotr] = useState(false);
   const [addPatient, setAddPatient] = useState(false);
+  const [addAdmin, setAddAdmin] = useState(false);
   const [authComponent, setAuthComponent] = useState(true);
   const [doctorDetails, setDoctorDetails] = useState();
   const [patientDetails, setPatientDetails] = useState();
@@ -325,6 +327,7 @@ const index = () => {
         <Auth
           setAddDocotr={setAddDocotr}
           setAddPatient={setAddPatient}
+          setAddAdmin={setAddAdmin}
           address={address}
           connectMetaMask={connectMetaMask}
           SHORTEN_ADDRESS={SHORTEN_ADDRESS}
@@ -338,6 +341,7 @@ const index = () => {
           registerDoctors={registerDoctors}
         />
       )}
+      {addAdmin && <AddAdmin setAddAdmin={setAddAdmin} />}
       {loader && <Loader />}
     </>
   );

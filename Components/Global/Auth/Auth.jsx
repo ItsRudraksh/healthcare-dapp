@@ -17,6 +17,7 @@ import Steps from "./Steps";
 const Auth = ({
   setAddDocotr,
   setAddPatient,
+  setAddAdmin,
   address,
   connectMetaMask,
   SHORTEN_ADDRESS,
@@ -55,6 +56,15 @@ const Auth = ({
                         iconOne={<HeroCard1 />}
                         iconTwo={<HeroCard4 />}
                         classStyle={"bg-danger "}
+                      />
+                      <Card
+                        handleClick={address ? setAddAdmin : connectMetaMask}
+                        title={"Admin Registration"}
+                        patient={"1"}
+                        number={"0"}
+                        iconOne={<HeroCard2 />}
+                        iconTwo={<HeroCard6 />}
+                        classStyle={"bg-info"}
                       />
                       <div className="new-account mt-3">
                         <p className="mb-0">

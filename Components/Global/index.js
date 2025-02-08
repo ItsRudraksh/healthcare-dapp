@@ -39,10 +39,12 @@ import Chat from "./Chat/Chat";
 import AI from "./AI/AI";
 import AddDoctor from "./Auth/AddDoctor";
 import AddPatient from "./Auth/AddPatient";
+import AddAdmin from "./Auth/AddAdmin";
 import Auth from "./Auth/Auth";
 
 export {
   AddDoctor,
+  AddAdmin,
   UpdateAdmin,
   DoctorAppointment,
   Notifications,

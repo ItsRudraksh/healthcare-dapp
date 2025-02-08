@@ -1,15 +1,10 @@
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
-import OpenAI from "openai";
 import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import Healthcare from "../artifacts/contracts/Medical.sol/Healthcare.json";
 
-import Healthcare from "./Healthcare.json";
-
-//OPEN AI
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-  dangerouslyAllowBrowser: true,
-});
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 
 const HEALTH_CARE_ABI = Healthcare.abi;
 const HEALTH_CARE_ADDRESS = process.env.NEXT_PUBLIC_HEALTH_CARE;
@@ -1085,24 +1080,36 @@ export const UPLOAD_METADATA = async (data) => {
   return url;
 };
 
-//----END OF IPFS UPLOAD--------
-
-//-----------OPEN AI-------------
-
 export const ASK_AI_CHAT = async (prompt) => {
   if (!prompt) {
     return "Prompt Missing";
   }
 
-  const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: prompt }],
-    model: "gpt-4o",
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction:
+      "You are a helpful and informative medical professional. Please answer questions related to health, medicine, and well-being to the best of your ability. If you are unsure of an answer, please state that you do not know. Do not provide medical advice, but rather general information.",
+    tools: [
+      {
+        googleSearch: {},
+      },
+    ],
   });
 
-  if (completion?.choices[0].message) {
-    const response = {
+  const chat = model.startChat({
+    history: [],
+    generationConfig: {
+      maxOutputTokens: 2048,
+    },
+  });
+
+  const result = await chat.sendMessage(prompt);
+  const response = result.response;
+
+  if (response) {
+    const responseData = {
       prompt: prompt,
-      message: completion.choices[0].message.content,
+      message: response.text(),
       timestamp: new Date().toISOString(),
     };
 
@@ -1110,16 +1117,12 @@ export const ASK_AI_CHAT = async (prompt) => {
     const AI_ASK_HISTORY = localStorage.getItem("AI_ASK_HISTORY");
     if (AI_ASK_HISTORY) {
       CHAT_AI_ARRAY = JSON.parse(localStorage.getItem("AI_ASK_HISTORY"));
-      CHAT_AI_ARRAY.push(response);
+      CHAT_AI_ARRAY.push(responseData);
       localStorage.setItem("AI_ASK_HISTORY", JSON.stringify(CHAT_AI_ARRAY));
     } else {
-      CHAT_AI_ARRAY.push(response);
+      CHAT_AI_ARRAY.push(responseData);
       localStorage.setItem("AI_ASK_HISTORY", JSON.stringify(CHAT_AI_ARRAY));
     }
+    return response.text();
   }
-
-  console.log(completion.choices[0]);
-  return completion.choices[0].message.content;
 };
-
-//-----------END OF OPEN AI-------------
