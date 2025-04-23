@@ -221,7 +221,7 @@ const AddAdmin = ({ setAddAdmin }) => {
                 </div>
                 <div className="col-xl-12">
                   <div className="form-group">
-                    <label className="col-form-label">Upload Profile</label>
+                    <label className="col-form-label">Upload Profile (Optional - can be added later)</label>
                     <input
                       className="form-control"
                       id="file"

@@ -393,6 +393,7 @@ export const StateContextProvider = ({ children }) => {
         image,
         biography,
       } = doctor;
+
       if (
         !title ||
         !firstName ||
@@ -412,10 +413,12 @@ export const StateContextProvider = ({ children }) => {
         !registrationID ||
         !collageAddress ||
         !walletAddress ||
-        !image ||
         !biography
       )
         return notifyError("Data missing");
+
+      // Set default image if not provided
+      const profileImage = image || "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy679PfFcZypHFGCzrHVMG1";
 
       setLoader(true);
       notifySuccess("Registrations processing... ");
@@ -439,7 +442,7 @@ export const StateContextProvider = ({ children }) => {
         registrationID: registrationID,
         collageAddress: collageAddress,
         walletAddress: walletAddress,
-        image: image,
+        image: profileImage,
         biography: biography,
       });
 
@@ -694,13 +697,15 @@ export const StateContextProvider = ({ children }) => {
         !emailID ||
         !birth ||
         !walletAddress ||
-        !image ||
         !message ||
         !city ||
         !doctorName ||
         !doctorAddress
       )
         return notifyError("Data missing");
+
+      // Set default image if not provided
+      const profileImage = image || "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy679PfFcZypHFGCzrHVMG1";
 
       setLoader(true);
       notifySuccess("Registrations processing... ");
@@ -718,7 +723,7 @@ export const StateContextProvider = ({ children }) => {
         doctorName: doctorName,
         doctorAddress: doctorAddress,
         walletAddress: walletAddress,
-        image: image,
+        image: profileImage,
         message: message,
         city: city,
       });
@@ -1059,6 +1064,81 @@ export const StateContextProvider = ({ children }) => {
     }
   };
 
+  // UPDATE PROFILE PICTURE
+  const UPDATE_PROFILE_PICTURE = async (imageUrl) => {
+    try {
+      if (!imageUrl) return notifyError("No image provided");
+
+      setLoader(true);
+      notifySuccess("Updating profile picture...");
+
+      const address = await CHECKI_IF_CONNECTED_LOAD();
+      if (address) {
+        const contract = await HEALTH_CARE_CONTARCT();
+        
+        // Check if user is a doctor or patient
+        const isDoctor = await contract.registeredDoctors(address);
+        const isPatient = await contract.registeredPatients(address);
+        
+        if (isDoctor) {
+          const doctorId = await contract.GET_DOCTOR_ID(address);
+          // Get current doctor data
+          const doctor = await contract.doctors(doctorId);
+          
+          // Create updated IPFS data with new image
+          const currentData = await fetch(doctor.IPFS_URL).then(res => res.json());
+          currentData.image = imageUrl;
+          
+          // Upload updated data to IPFS
+          const updatedIpfsUrl = await UPLOAD_METADATA(currentData);
+          
+          // Update doctor record with new IPFS URL
+          const transaction = await contract.UPDATE_DOCTOR_PROFILE(updatedIpfsUrl, {
+            gasLimit: ethers.utils.hexlify(8000000),
+          });
+          
+          await transaction.wait();
+          setLoader(false);
+          notifySuccess("Profile picture updated successfully");
+          return true;
+        } 
+        else if (isPatient) {
+          const patientId = await contract.GET_PATIENT_ID(address);
+          // Get current patient data
+          const patient = await contract.patients(patientId);
+          
+          // Create updated IPFS data with new image
+          const currentData = await fetch(patient.IPFS_URL).then(res => res.json());
+          currentData.image = imageUrl;
+          
+          // Upload updated data to IPFS
+          const updatedIpfsUrl = await UPLOAD_METADATA(currentData);
+          
+          // Update patient record with new IPFS URL
+          const transaction = await contract.UPDATE_PATIENT_PROFILE(updatedIpfsUrl, {
+            gasLimit: ethers.utils.hexlify(8000000),
+          });
+          
+          await transaction.wait();
+          setLoader(false);
+          notifySuccess("Profile picture updated successfully");
+          return true;
+        }
+        else {
+          setLoader(false);
+          notifyError("User not registered as doctor or patient");
+          return false;
+        }
+      }
+    } catch (error) {
+      setLoader(false);
+      const errorMsg = PARSED_ERROR_MSG(error);
+      notifyError(errorMsg);
+      console.log(error);
+      return false;
+    }
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -1100,6 +1180,13 @@ export const StateContextProvider = ({ children }) => {
         loader,
         accountBalance,
         reCall,
+        setReCall,
+        setCurrency,
+        registerDoctors,
+        setRegisterDoctors,
+        registeredPatient,
+        setRegisteredPatient,
+        UPDATE_PROFILE_PICTURE,
       }}
     >
       {children}

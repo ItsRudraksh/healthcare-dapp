@@ -1126,4 +1126,38 @@ contract Healthcare {
     }
 
     //--------------END OF CHAT------------------
+
+    // UPDATE DOCTOR PROFILE
+    function UPDATE_DOCTOR_PROFILE(string memory _newIPFS_URL) public {
+        require(
+            registeredDoctors[msg.sender],
+            "Only registered doctors can update their profile"
+        );
+
+        uint doctorId = GET_DOCTOR_ID(msg.sender);
+        doctors[doctorId].IPFS_URL = _newIPFS_URL;
+
+        ADD_NOTIFICATION(
+            msg.sender,
+            "You have successfully updated your profile",
+            "Doctor"
+        );
+    }
+
+    // UPDATE PATIENT PROFILE
+    function UPDATE_PATIENT_PROFILE(string memory _newIPFS_URL) public {
+        require(
+            registeredPatients[msg.sender],
+            "Only registered patients can update their profile"
+        );
+
+        uint patientId = GET_PATIENT_ID(msg.sender);
+        patients[patientId].IPFS_URL = _newIPFS_URL;
+
+        ADD_NOTIFICATION(
+            msg.sender,
+            "You have successfully updated your profile",
+            "Patient"
+        );
+    }
 }

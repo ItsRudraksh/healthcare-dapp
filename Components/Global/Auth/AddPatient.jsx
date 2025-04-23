@@ -174,7 +174,7 @@ const AddPatient = ({ registerDoctors, setAddPatient }) => {
                 </div>{" "}
                 <div className="col-xl-6">
                   <div className="form-group">
-                    <label className="col-form-label">Upload Profile</label>
+                    <label className="col-form-label">Upload Profile (Optional - can be added later)</label>
                     <input
                       size={16}
                       className="form-control"

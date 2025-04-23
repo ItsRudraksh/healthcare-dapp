@@ -20,6 +20,7 @@ import {
   GET_DOCTOR_APPOINTMENTS_HISTORYS,
   GET_ALL_REGISTERED_MEDICINES,
   CHECK_DOCTOR_REGISTERATION,
+  UPLOAD_IPFS_IMAGE,
 } from "../../../Context/constants";
 
 import { useStateContext } from "../../../Context/index";
@@ -31,6 +32,9 @@ const DoctorProfile = ({ setPatientDetails, setOpenComponent, user }) => {
     BOOK_APPOINTMENT,
     PRESCRIBE_MEDICINE,
     UPDATE_PATIENT_MEDICAL_HISTORY,
+    UPDATE_PROFILE_PICTURE,
+    setLoader,
+    notifyError,
   } = useStateContext();
 
   const [doctorAppoinments, setDoctorAppoinments] = useState();
@@ -47,6 +51,27 @@ const DoctorProfile = ({ setPatientDetails, setOpenComponent, user }) => {
     message: "",
     patientID: "",
   });
+
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+
+  const handleImageChange = async (event) => {
+    try {
+      setLoader(true);
+      const file = event.target.files[0];
+      if (file) {
+        const imgUrl = await UPLOAD_IPFS_IMAGE(file);
+        await UPDATE_PROFILE_PICTURE(imgUrl);
+        setLoader(false);
+        setShowUpdateModal(false);
+        notifySuccess("Profile picture updated successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+      setLoader(false);
+      notifyError("Failed to update profile picture");
+    }
+  };
 
   const notifySuccess = (msg) => toast.success(msg, { duration: 2000 });
 
@@ -172,12 +197,21 @@ const DoctorProfile = ({ setPatientDetails, setOpenComponent, user }) => {
           <div className="card">
             <div className="card-body">
               <div className="media d-sm-flex d-block text-center text-sm-start pb-4 mb-4 border-bottom">
-                <img
-                  alt="image"
-                  className="rounded me-sm-4 me-0"
-                  width={130}
-                  src={user?.image}
-                />
+                <div className="position-relative">
+                  <img
+                    alt="image"
+                    className="rounded me-sm-4 me-0"
+                    width={130}
+                    src={user?.image}
+                  />
+                  <button 
+                    onClick={() => setShowUpdateModal(true)}
+                    className="btn btn-sm btn-primary position-absolute"
+                    style={{ bottom: "5px", right: "5px" }}
+                  >
+                    Update
+                  </button>
+                </div>
                 <div className="media-body align-items-center">
                   <div className="d-sm-flex d-block justify-content-between my-3 my-sm-0">
                     <div>
@@ -285,6 +319,40 @@ const DoctorProfile = ({ setPatientDetails, setOpenComponent, user }) => {
           </div>
         </div>
       </div>
+
+      {/* Profile Picture Update Modal */}
+      {showUpdateModal && (
+        <div className="modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Update Profile Picture</h5>
+                <button className="btn-close" onClick={() => setShowUpdateModal(false)} />
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="col-form-label">Choose New Profile Picture</label>
+                  <input
+                    className="form-control"
+                    id="file"
+                    onChange={handleImageChange}
+                    type="file"
+                    accept="image/*"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-danger light" 
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

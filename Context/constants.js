@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import Healthcare from "../artifacts/contracts/Medical.sol/Healthcare.json";
+import Healthcare from "./Healthcare.json";
 
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
 

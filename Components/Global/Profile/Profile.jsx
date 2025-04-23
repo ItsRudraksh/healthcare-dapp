@@ -24,39 +24,64 @@ import {
   GET_PATIENT_APPOINTMENT,
   GET_PATIENT_APPOINTMENT_HISTORYS,
   CHECKI_IF_CONNECTED_LOAD,
+  GET_DOCTOR_DETAILS,
+  UPLOAD_IPFS_IMAGE,
 } from "../../../Context/constants";
 import Card from "./Card";
+import { useStateContext } from "../../../Context/index";
 
 const Profile = ({ user, setOpenComponent, setDoctorDetails }) => {
-  const notifySuccess = (msg) => toast.success(msg, { duration: 2000 });
+  const { CHECKI_IF_CONNECTED_LOAD, address, UPDATE_PROFILE_PICTURE, setLoader, notifySuccess, notifyError } = useStateContext();
   const [doctor, setDoctor] = useState();
   const [patientAppoinment, setPatientAppoinment] = useState();
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   const copyText = (text) => {
     navigator.clipboard.writeText(text);
-    notifySuccess("Copied successfully");
+    notifySuccess("Address copied to clipboard");
+  };
+
+  const handleImageChange = async (event) => {
+    try {
+      setLoader(true);
+      const file = event.target.files[0];
+      if (file) {
+        const imgUrl = await UPLOAD_IPFS_IMAGE(file);
+        await UPDATE_PROFILE_PICTURE(imgUrl);
+        setLoader(false);
+        setShowUpdateModal(false);
+        notifySuccess("Profile picture updated successfully");
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+      setLoader(false);
+      notifyError("Failed to update profile picture");
+    }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (user) {
-          CHECK_DOCTOR_REGISTERATION(user?.doctorAddress).then((doctor) => {
-            setDoctor(doctor);
-          });
+        const address = await CHECKI_IF_CONNECTED_LOAD();
+        if (address) {
           GET_PATIENT_APPOINTMENT_HISTORYS(user?.patientID).then(
-            (appoinment) => {
-              setPatientAppoinment(appoinment);
+            (appointment) => {
+              setPatientAppoinment(appointment);
             }
           );
+
+          GET_DOCTOR_DETAILS(user?.doctorID).then((doctor) => {
+            setDoctor(doctor);
+          });
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching data", error);
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [user?.patientID, user?.doctorID]);
 
   return (
     <div className="container-fluid">
@@ -70,12 +95,21 @@ const Profile = ({ user, setOpenComponent, setDoctorDetails }) => {
           <div className="card">
             <div className="card-body">
               <div className="media d-sm-flex d-block text-center text-sm-start pb-4 mb-4 border-bottom">
-                <img
-                  alt="image"
-                  className="rounded me-sm-4 me-0"
-                  width={130}
-                  src={user?.image}
-                />
+                <div className="position-relative">
+                  <img
+                    alt="image"
+                    className="rounded me-sm-4 me-0"
+                    width={130}
+                    src={user?.image}
+                  />
+                  <button 
+                    onClick={() => setShowUpdateModal(true)}
+                    className="btn btn-sm btn-primary position-absolute"
+                    style={{ bottom: "5px", right: "5px" }}
+                  >
+                    Update
+                  </button>
+                </div>
                 <div className="media-body align-items-center">
                   <div className="d-sm-flex d-block justify-content-between my-3 my-sm-0">
                     <div>
@@ -230,6 +264,40 @@ const Profile = ({ user, setOpenComponent, setDoctorDetails }) => {
           </div>
         </div>
       </div>
+
+      {/* Profile Picture Update Modal */}
+      {showUpdateModal && (
+        <div className="modal" style={{ display: "block", backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Update Profile Picture</h5>
+                <button className="btn-close" onClick={() => setShowUpdateModal(false)} />
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label className="col-form-label">Choose New Profile Picture</label>
+                  <input
+                    className="form-control"
+                    id="file"
+                    onChange={handleImageChange}
+                    type="file"
+                    accept="image/*"
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="btn btn-danger light" 
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
