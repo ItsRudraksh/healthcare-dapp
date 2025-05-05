@@ -110,7 +110,7 @@ graph TD
     G -- JSON-RPC Calls --> N1;
     C -- Optional Backend Interaction --> N1;
 
-    style F fill:#f9f,stroke:#333,stroke-width:2px
+    style F fill:#f9f,stroke:#333,stroke-width:2px,color:#000
     style N1 fill:#ccf,stroke:#333,stroke-width:1px,color:#000
     style N2 fill:#ccf,stroke:#333,stroke-width:1px,color:#000
     style N3 fill:#ccf,stroke:#333,stroke-width:1px,color:#000
