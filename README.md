@@ -111,12 +111,12 @@ graph TD
     C -- Optional Backend Interaction --> N1;
 
     style F fill:#f9f,stroke:#333,stroke-width:2px
-    style N1 stroke:#333,stroke-width:1px
-    style N2 stroke:#333,stroke-width:1px
-    style N3 stroke:#333,stroke-width:1px
-    style N4 stroke:#333,stroke-width:1px
-    style P stroke:#333,stroke-width:1px
-    style GR stroke:#333,stroke-width:1px
+    style N1 fill:#ccf,stroke:#333,stroke-width:1px,color:#fff
+    style N2 fill:#ccf,stroke:#333,stroke-width:1px,color:#fff
+    style N3 fill:#ccf,stroke:#333,stroke-width:1px,color:#fff
+    style N4 fill:#ccf,stroke:#333,stroke-width:1px,color:#fff
+    style P fill:#fcc,stroke:#333,stroke-width:1px,color:#fff
+    style GR fill:#cfc,stroke:#333,stroke-width:1px,color:#fff
 ```
 
 ## QBFT Consensus Flow (Simplified)
@@ -328,12 +328,12 @@ graph TD
 
     User -- View Dashboards --> Graf;
 
-    style Node1 stroke:#333
-    style Node2 stroke:#333
-    style Node3 stroke:#333
-    style Node4 stroke:#333
-    style Prom stroke:#333
-    style Graf stroke:#333
+    style Node1 fill:#ccf,stroke:#333,color:#fff
+    style Node2 fill:#ccf,stroke:#333,color:#fff
+    style Node3 fill:#ccf,stroke:#333,color:#fff
+    style Node4 fill:#ccf,stroke:#333,color:#fff
+    style Prom fill:#fcc,stroke:#333,color:#fff
+    style Graf fill:#cfc,stroke:#333,color:#fff
 ```
 
 ## User Roles and Permissions (Conceptual)
